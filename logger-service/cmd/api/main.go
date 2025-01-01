@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"logger-service/cmd/data"
+	"net/http"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,7 +24,7 @@ var client *mongo.Client
 
 type Config struct {
 
-	// Models 
+	Models data.Models
 }
 
 
@@ -41,7 +44,35 @@ func main() {
 			log.Println("Error disconnecting:", err)
 		}
 	}()
+
+	app := Config{
+		Models: data.New(client),
+	}
+
+	srv := &http.Server{
+		Addr: fmt.Sprintf(":%s", webPort),
+		Handler: app.routes(),
+	}
+
+	err = srv.ListenAndServe()
+	if err != nil {
+		log.Panic(err)
+	}
+
 }
+
+// func (app *Config) serve() {
+// 	srv := &http.Server{
+// 		Addr: fmt.Sprintf(":%s", webPort),
+// 		Handler: app.routes(),
+// 	}
+
+// 	err := srv.ListenAndServe()
+// 	if err != nil {
+// 		log.Panic(err)
+// 	}
+
+// }
 
 func connectToMongo() (*mongo.Client, error) {
 	// create connection options
@@ -61,3 +92,5 @@ func connectToMongo() (*mongo.Client, error) {
 	return c, nil
 
 }
+
+
