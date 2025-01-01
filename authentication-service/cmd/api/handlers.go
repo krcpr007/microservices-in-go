@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"net/http"
-	"data"
 )
 
 func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +19,7 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// validate the user  
-	user, err := app.Models.Users.GetByEmail(requestPayload.Email)
+	user, err := app.Models.User.GetByEmail(requestPayload.Email)
 
 	if err != nil {
 		app.errorJSON(w, errors.New("Invalid Creadentials"), http.StatusUnauthorized)
